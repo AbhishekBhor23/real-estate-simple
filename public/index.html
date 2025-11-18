@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Real Estate Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --bg: #0f172a;
+        --card-bg: #ffffff;
+        --muted: #64748b;
+        --danger: #ef4444;
+        --success: #16a34a;
+        --border: #e2e8f0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: radial-gradient(circle at top, #1d283a, #020617);
+        margin: 0;
+        color: #0f172a;
+      }
+
+      header {
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+
+      #userInfo {
+        font-size: 14px;
+        color: #cbd5f5;
+      }
+
+      #logoutBtn {
+        margin-left: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: transparent;
+        color: #e5e7eb;
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      #logoutBtn:hover {
+        background: rgba(148, 163, 184, 0.2);
+      }
+
+      .page {
+        max-width: 1200px;
+        margin: 20px auto 40px;
+        padding: 0 16px 40px;
+      }
+
+      .pill-tabs {
+        display: inline-flex;
+        background: rgba(15, 23, 42, 0.8);
+        padding: 4px;
+        border-radius: 999px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+      }
+
+      .pill-tabs button {
+        border: none;
+        background: transparent;
+        color: #e5e7eb;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .pill-tabs button.active {
+        background: #e5e7eb;
+        color: #111827;
+        font-weight: 600;
+      }
+
+      .section-title {
+        color: #e5e7eb;
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .muted {
+        color: #9ca3af;
+        font-size: 13px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        margin-top: 12px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 14px;
+        padding: 16px 16px 14px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.3);
+        border: 1px solid var(--border);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: rgba(37, 99, 235, 0.1);
+        color: #1d4ed8;
+        border: 1px solid rgba(37, 99, 235, 0.4);
+      }
+
+      .badge.owner {
+        background: rgba(56, 189, 248, 0.1);
+        border-color: rgba(56, 189, 248, 0.4);
+        color: #0369a1;
+      }
+
+      .badge.customer {
+        background: rgba(52, 211, 153, 0.1);
+        border-color: rgba(52, 211, 153, 0.4);
+        color: #047857;
+      }
+
+      form {
+        display: grid;
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #0f172a;
+      }
+
+      input,
+      select,
+      textarea {
+        margin-top: 2px;
+        padding: 7px 8px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 13px;
+        outline: none;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+
+      button.primary {
+        border: none;
+        background: linear-gradient(to right, var(--primary), var(--primary-dark));
+        color: white;
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        justify-self: flex-start;
+      }
+
+      button.primary:hover {
+        filter: brightness(1.05);
+      }
+
+      button.outline {
+        border-radius: 999px;
+        border: 1px solid #cbd5e1;
+        padding: 6px 10px;
+        font-size: 12px;
+        background: white;
+        cursor: pointer;
+      }
+
+      button.outline.danger {
+        border-color: rgba(248, 113, 113, 0.8);
+        color: #b91c1c;
+        background: #fef2f2;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 13px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 6px 4px;
+        text-align: left;
+      }
+
+      th {
+        color: #6b7280;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      #notification {
+        position: fixed;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 260px;
+        max-width: 90%;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.95);
+        color: #e5e7eb;
+        font-size: 13px;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+        z-index: 50;
+      }
+
+      #notification.success {
+        border: 1px solid rgba(34, 197, 94, 0.7);
+      }
+
+      #notification.error {
+        border: 1px solid rgba(248, 113, 113, 0.8);
+      }
+
+      #notification span {
+        flex: 1;
+      }
+
+      #notification button {
+        border: none;
+        background: transparent;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 16px;
+        }
+        .card {
+          padding: 14px 14px 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Real Estate Management</h1>
+      <div>
+        <span id="userInfo">Checking session…</span>
+        <button id="logoutBtn" style="display: none">Logout</button>
+      </div>
+    </header>
+
+    <div class="page">
+      <!-- TOP TABS: Auth / Owner / Customer -->
+      <div class="pill-tabs">
+        <button class="tab-btn active" data-tab="authTab">Auth</button>
+        <button class="tab-btn" data-tab="ownerTab">Owner</button>
+        <button class="tab-btn" data-tab="customerTab">Customer</button>
+      </div>
+
+      <!-- AUTH SECTION -->
+      <section id="authTab">
+        <h2 class="section-title">Authentication</h2>
+        <p class="muted">
+          Create an account as <strong>Owner</strong> or <strong>Customer</strong>,
+          then login to manage properties or bookings.
+        </p>
+        <div class="grid" style="margin-top: 16px">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Register</h3>
+              <span class="badge">New account</span>
+            </div>
+            <form id="registerForm">
+              <label>
+                Role
+                <select id="regRole">
+                  <option value="CUSTOMER">Customer</option>
+                  <option value="OWNER">Owner</option>
+                </select>
+              </label>
+              <label>First Name <input id="regFirstName" required /></label>
+              <label>Last Name <input id="regLastName" required /></label>
+              <label>Email <input id="regEmail" type="email" required /></label>
+              <label>Phone <input id="regPhone" required /></label>
+              <label>Password <input id="regPassword" type="password" required /></label>
+              <button type="submit" class="primary">Register</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Login</h3>
+              <span class="badge">Existing user</span>
+            </div>
+            <form id="loginForm">
+              <label>Email <input id="loginEmail" type="email" required /></label>
+              <label>Password <input id="loginPassword" type="password" required /></label>
+              <button type="submit" class="primary">Login</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- OWNER SECTION -->
+      <section id="ownerTab" style="display: none">
+        <h2 class="section-title">
+          Owner Dashboard <span class="badge owner">OWNER</span>
+        </h2>
+        <p class="muted">Add properties and loan info. Only visible when logged in as Owner.</p>
+
+        <div class="grid">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Add Property</h3>
+            </div>
+            <form id="addPropertyForm">
+              <label>Property Name <input id="propName" required /></label>
+              <label>Location <input id="propLocation" required /></label>
+              <label>Type <input id="propType" value="Flat" /></label>
+              <label>BHK <input id="propBhk" type="number" /></label>
+              <label>Area (sq ft) <input id="propArea" type="number" /></label>
+              <label>Price <input id="propPrice" type="number" required /></label>
+              <button type="submit" class="primary">Add Property</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Add Loan Info</h3>
+            </div>
+            <form id="loanForm">
+              <label>Bank Name <input id="loanBank" /></label>
+              <label>Rate of Interest (%) <input id="loanRoi" type="number" /></label>
+              <label>Tenure (months) <input id="loanTenure" type="number" /></label>
+              <label>Max Amount <input id="loanMax" type="number" /></label>
+              <label>Site Link <input id="loanLink" /></label>
+              <button type="submit" class="primary">Add Loan</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px">
+          <div class="card-header">
+            <h3 class="card-title">My Properties</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="myPropertiesTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CUSTOMER SECTION -->
+      <section id="customerTab" style="display: none">
+        <h2 class="section-title">
+          Customer Dashboard <span class="badge customer">CUSTOMER</span>
+        </h2>
+        <p class="muted">
+          Browse properties, make bookings, complete payments and cancel if needed.
+        </p>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Available Properties</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Price</th>
+                <th>BHK</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="availablePropertiesTable"></tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top: 16px">
+          <div class="card-header">
+            <h3 class="card-title">My Bookings</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Status</th>
+                <th>Amount Paid</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="myBookingsTable"></tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top: 16px">
+          <div class="card-header">
+            <h3 class="card-title">Add Testimonial</h3>
+          </div>
+          <form id="testimonialForm">
+            <label>Name <input id="testName" /></label>
+            <label>Profession <input id="testProfession" /></label>
+            <label>Message <textarea id="testMessage"></textarea></label>
+            <label>
+              Satisfaction (1–5)
+              <input id="testSatisfaction" type="number" min="1" max="5" />
+            </label>
+            <button type="submit" class="primary">Submit Testimonial</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- COMMON: LOANS & TESTIMONIALS -->
+      <div class="card" style="margin-top: 24px">
+        <div class="card-header">
+          <h3 class="card-title">Home Loan Offers</h3>
+          <span class="muted">Visible to all users</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Bank</th>
+              <th>ROI (%)</th>
+              <th>Tenure (months)</th>
+              <th>Max Amount</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="loansTable"></tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top: 16px">
+        <div class="card-header">
+          <h3 class="card-title">Customer Testimonials</h3>
+        </div>
+        <ul id="testimonialsList" style="padding-left: 16px; margin: 8px 0"></ul>
+      </div>
+    </div>
+
+    <!-- Notification Bar -->
+    <div id="notification">
+      <span id="notificationText"></span>
+      <button id="notificationClose">×</button>
+    </div>
+
+    <script>
+      const userInfoSpan = document.getElementById("userInfo");
+      const ownerSection = document.getElementById("ownerTab");
+      const customerSection = document.getElementById("customerTab");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      const notification = document.getElementById("notification");
+      const notificationText = document.getElementById("notificationText");
+      const notificationClose = document.getElementById("notificationClose");
+
+      let notificationTimeout = null;
+
+      function showMessage(msg, type = "success") {
+        notificationText.textContent = msg;
+        notification.className = "";
+        notification.classList.add(type === "error" ? "error" : "success");
+        notification.style.display = "flex";
+
+        if (notificationTimeout) clearTimeout(notificationTimeout);
+        notificationTimeout = setTimeout(() => {
+          notification.style.display = "none";
+        }, 3000);
+      }
+
+      notificationClose.onclick = () => {
+        notification.style.display = "none";
+      };
+
+      // Tabs
+      const tabButtons = document.querySelectorAll(".tab-btn");
+      const tabs = {
+        authTab: document.getElementById("authTab"),
+        ownerTab: document.getElementById("ownerTab"),
+        customerTab: document.getElementById("customerTab"),
+      };
+
+      tabButtons.forEach((btn) => {
+        btn.onclick = () => {
+          tabButtons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          const target = btn.dataset.tab;
+          Object.entries(tabs).forEach(([id, el]) => {
+            el.style.display = id === target ? "block" : "none";
+          });
+        };
+      });
+
+      // ---------- AUTH ----------
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const body = {
+            role: document.getElementById("regRole").value,
+            firstName: document.getElementById("regFirstName").value,
+            lastName: document.getElementById("regLastName").value,
+            email: document.getElementById("regEmail").value,
+            phone: document.getElementById("regPhone").value,
+            password: document.getElementById("regPassword").value,
+          };
+          const res = await fetch("/api/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showMessage(data.message || "Registered successfully", "success");
+            e.target.reset();
+            await loadMe();
+          } else {
+            showMessage(data.error || "Registration failed", "error");
+          }
+        });
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const body = {
+            email: document.getElementById("loginEmail").value,
+            password: document.getElementById("loginPassword").value,
+          };
+          const res = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showMessage(data.message || "Login successful", "success");
+            await loadMe();
+          } else {
+            showMessage(data.error || "Login failed", "error");
+          }
+        });
+
+      logoutBtn.addEventListener("click", async () => {
+        const res = await fetch("/api/logout", { method: "POST" });
+        const data = await res.json();
+        showMessage(data.message || "Logged out", "success");
+        await loadMe();
+      });
+
+      async function loadMe() {
+        const res = await fetch("/api/me");
+        const user = await res.json();
+
+        if (!user) {
+          userInfoSpan.textContent = "Not logged in";
+          logoutBtn.style.display = "none";
+          ownerSection.style.display = "none";
+          customerSection.style.display = "none";
+        } else {
+          userInfoSpan.textContent =
+            "Logged in as " + user.firstName + " (" + user.role + ")";
+          logoutBtn.style.display = "inline-block";
+
+          if (user.role === "OWNER") {
+            ownerSection.style.display = "block";
+            customerSection.style.display = "none";
+            document
+              .querySelector('.tab-btn[data-tab="ownerTab"]')
+              .classList.add("active");
+            document
+              .querySelector('.tab-btn[data-tab="authTab"]')
+              .classList.remove("active");
+            tabs.authTab.style.display = "none";
+            tabs.ownerTab.style.display = "block";
+            loadMyProperties();
+          } else {
+            ownerSection.style.display = "none";
+            customerSection.style.display = "block";
+            document
+              .querySelector('.tab-btn[data-tab="customerTab"]')
+              .classList.add("active");
+            document
+              .querySelector('.tab-btn[data-tab="authTab"]')
+              .classList.remove("active");
+            tabs.authTab.style.display = "none";
+            tabs.customerTab.style.display = "block";
+            loadAvailableProperties();
+            loadMyBookings();
+          }
+        }
+
+        loadLoans();
+        loadTestimonials();
+      }
+
+      // ---------- OWNER: PROPERTIES ----------
+      document
+        .getElementById("addPropertyForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const body = {
+            name: document.getElementById("propName").value,
+            location: document.getElementById("propLocation").value,
+            type: document.getElementById("propType").value,
+            bhk: Number(document.getElementById("propBhk").value),
+            area: Number(document.getElementById("propArea").value),
+            price: Number(document.getElementById("propPrice").value),
+          };
+          const res = await fetch("/api/properties", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showMessage("Property added", "success");
+            e.target.reset();
+            loadMyProperties();
+            loadAvailableProperties();
+          } else {
+            showMessage(data.error || "Failed to add property", "error");
+          }
+        });
+
+      async function loadMyProperties() {
+        const res = await fetch("/api/my-properties");
+        if (!res.ok) return;
+        const data = await res.json();
+        const tbody = document.getElementById("myPropertiesTable");
+        tbody.innerHTML = "";
+        data.forEach((p) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${p.name}</td>
+            <td>${p.location}</td>
+            <td>${p.price}</td>
+            <td>${p.status}</td>
+            <td>
+              <button data-id="${p._id}" class="outline danger deletePropBtn">
+                Delete
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.querySelectorAll(".deletePropBtn").forEach((btn) => {
+          btn.onclick = async () => {
+            if (!confirm("Delete this property?")) return;
+            const id = btn.getAttribute("data-id");
+            const res = await fetch("/api/properties/" + id, {
+              method: "DELETE",
+            });
+            const data = await res.json();
+            if (res.ok) {
+              showMessage(data.message || "Property deleted", "success");
+              loadMyProperties();
+              loadAvailableProperties();
+            } else {
+              showMessage(data.error || "Delete failed", "error");
+            }
+          };
+        });
+      }
+
+      // ---------- CUSTOMER: PROPERTIES / BOOKINGS ----------
+      async function loadAvailableProperties() {
+        const res = await fetch("/api/properties");
+        if (!res.ok) return;
+        const data = await res.json();
+        const tbody = document.getElementById("availablePropertiesTable");
+        tbody.innerHTML = "";
+        data.forEach((p) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${p.name}</td>
+            <td>${p.location}</td>
+            <td>${p.price}</td>
+            <td>${p.bhk || ""}</td>
+            <td>
+              <button data-id="${p._id}" class="outline bookBtn">Book</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.querySelectorAll(".bookBtn").forEach((btn) => {
+          btn.onclick = async () => {
+            const id = btn.getAttribute("data-id");
+            const res = await fetch("/api/bookings", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ propertyId: id }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              showMessage("Property booked", "success");
+              loadAvailableProperties();
+              loadMyBookings();
+            } else {
+              showMessage(data.error || "Booking failed", "error");
+            }
+          };
+        });
+      }
+
+      async function loadMyBookings() {
+        const res = await fetch("/api/my-bookings");
+        if (!res.ok) return;
+        const data = await res.json();
+        const tbody = document.getElementById("myBookingsTable");
+        tbody.innerHTML = "";
+        data.forEach((b) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${b.property ? b.property.name : ""}</td>
+            <td>${b.status}</td>
+            <td>${b.amountPaid}</td>
+            <td>
+              <button data-id="${b._id}" class="outline payBtn">Pay</button>
+              <button data-id="${b._id}" class="outline danger cancelBtn">Cancel</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.querySelectorAll(".payBtn").forEach((btn) => {
+          btn.onclick = async () => {
+            const amount = prompt("Enter amount to pay:");
+            if (!amount) return;
+            const id = btn.getAttribute("data-id");
+            const res = await fetch(`/api/bookings/${id}/pay`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ amount: Number(amount) }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              showMessage(data.message || "Payment recorded", "success");
+              loadMyBookings();
+              loadAvailableProperties();
+            } else {
+              showMessage(data.error || "Payment failed", "error");
+            }
+          };
+        });
+
+        document.querySelectorAll(".cancelBtn").forEach((btn) => {
+          btn.onclick = async () => {
+            const refund = prompt("Enter refund amount:");
+            if (!refund) return;
+            const id = btn.getAttribute("data-id");
+            const res = await fetch(`/api/bookings/${id}/cancel`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refundAmount: Number(refund) }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              showMessage(data.message || "Booking cancelled", "success");
+              loadMyBookings();
+              loadAvailableProperties();
+            } else {
+              showMessage(data.error || "Cancellation failed", "error");
+            }
+          };
+        });
+      }
+
+      // ---------- LOANS ----------
+      document
+        .getElementById("loanForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const body = {
+            bankName: document.getElementById("loanBank").value,
+            rateOfInterest: Number(document.getElementById("loanRoi").value),
+            tenureMonths: Number(document.getElementById("loanTenure").value),
+            maxAmount: Number(document.getElementById("loanMax").value),
+            siteLink: document.getElementById("loanLink").value,
+          };
+          const res = await fetch("/api/loans", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showMessage("Loan added", "success");
+            e.target.reset();
+            loadLoans();
+          } else {
+            showMessage(data.error || "Failed to add loan", "error");
+          }
+        });
+
+      async function loadLoans() {
+        const res = await fetch("/api/loans");
+        if (!res.ok) return;
+        const data = await res.json();
+        const tbody = document.getElementById("loansTable");
+        tbody.innerHTML = "";
+        data.forEach((l) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${l.bankName || ""}</td>
+            <td>${l.rateOfInterest || ""}</td>
+            <td>${l.tenureMonths || ""}</td>
+            <td>${l.maxAmount || ""}</td>
+            <td>${
+              l.siteLink
+                ? `<a href="${l.siteLink}" target="_blank">Visit</a>`
+                : ""
+            }</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // ---------- TESTIMONIALS ----------
+      document
+        .getElementById("testimonialForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const body = {
+            customerName: document.getElementById("testName").value,
+            profession: document.getElementById("testProfession").value,
+            message: document.getElementById("testMessage").value,
+            satisfaction: Number(
+              document.getElementById("testSatisfaction").value
+            ),
+          };
+          const res = await fetch("/api/testimonials", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showMessage("Testimonial added", "success");
+            e.target.reset();
+            loadTestimonials();
+          } else {
+            showMessage(data.error || "Failed to add testimonial", "error");
+          }
+        });
+
+      async function loadTestimonials() {
+        const res = await fetch("/api/testimonials");
+        if (!res.ok) return;
+        const data = await res.json();
+        const ul = document.getElementById("testimonialsList");
+        ul.innerHTML = "";
+        data.forEach((t) => {
+          const li = document.createElement("li");
+          li.textContent = `${t.customerName || "Anonymous"} ${
+            t.profession ? "(" + t.profession + ")" : ""
+          } ${t.satisfaction ? "[" + t.satisfaction + "/5]" : ""} – ${
+            t.message || ""
+          }`;
+          ul.appendChild(li);
+        });
+      }
+
+      // ---------- INITIAL ----------
+      loadMe();
+    </script>
+  </body>
+</html>
